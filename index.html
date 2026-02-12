@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Task Tracker (Static)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 antialiased">
+    
+    <div id="app" class="min-h-screen flex flex-col">
+        <!-- Navigation -->
+        <nav class="bg-white border-b border-gray-200 shadow-sm">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center justify-between w-full">
+                        <div class="shrink-0 flex items-center font-bold text-xl text-primary">
+                            Daily Tasks Tracker
+                        </div>
+                        <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                            <a href="#" onclick="app.setView('dashboard')" id="nav-dashboard" class="border-primary text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                Dashboard
+                            </a>
+                            <a href="#" onclick="app.setView('history')" id="nav-history" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                History
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="flex-1 py-10">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <!-- Dashboard View -->
+                <div id="view-dashboard">
+                    <!-- Progress Bar -->
+                    <div class="mb-8 bg-white overflow-hidden shadow-sm sm:rounded-2xl p-6">
+                        <div class="flex justify-between items-end mb-2">
+                            <div>
+                                <h1 class="text-2xl font-bold text-gray-900">Today's Progress</h1>
+                                <p class="text-gray-500 text-sm mt-1" id="current-date">Fetching date...</p>
+                            </div>
+                            <div class="text-3xl font-bold text-primary" id="progress-percentage">0%</div>
+                        </div>
+                        <div class="w-full bg-gray-100 rounded-full h-3">
+                            <div class="bg-primary h-3 rounded-full transition-all duration-500 ease-out" id="progress-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Tasks List -->
+                    <div class="bg-white shadow-sm sm:rounded-2xl overflow-hidden">
+                        <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                            <h2 class="text-lg font-bold text-gray-900">Tasks</h2>
+                            <div class="space-x-2">
+                                <button onclick="app.openModal('categories-modal')" class="text-sm text-gray-500 hover:text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+                                    Manage Categories
+                                </button>
+                                <button onclick="app.openModal('task-modal')" class="bg-primary text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors shadow-sm font-medium">
+                                    + New Task
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="tasks-container" class="divide-y divide-gray-100">
+                            <!-- Tasks will be injected here -->
+                            <div class="p-8 text-center text-gray-500">
+                                Loading tasks...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History View -->
+                <div id="view-history" class="hidden">
+                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-2xl p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <button onclick="app.changeMonth(-1)" class="p-2 rounded-full hover:bg-gray-100">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                            </button>
+                            <h3 class="text-xl font-bold text-gray-900" id="history-month-label">Month Year</h3>
+                            <button onclick="app.changeMonth(1)" class="p-2 rounded-full hover:bg-gray-100">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-7 gap-2 mb-2">
+                            <div class="text-center text-xs font-medium text-gray-400 py-2">Sun</div>
+                            <div class="text-center text-xs font-medium text-gray-400 py-2">Mon</div>
+                            <div class="text-center text-xs font-medium text-gray-400 py-2">Tue</div>
+                            <div class="text-center text-xs font-medium text-gray-400 py-2">Wed</div>
+                            <div class="text-center text-xs font-medium text-gray-400 py-2">Thu</div>
+                            <div class="text-center text-xs font-medium text-gray-400 py-2">Fri</div>
+                            <div class="text-center text-xs font-medium text-gray-400 py-2">Sat</div>
+                        </div>
+                        
+                        <div id="calendar-grid" class="grid grid-cols-7 gap-2">
+                            <!-- Calendar days injected here -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Task Modal -->
+    <div id="task-modal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="app.closeModal('task-modal')"></div>
+        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+            <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                    <form id="task-form" onsubmit="app.saveTask(event)">
+                        <input type="hidden" id="task-id">
+                        <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                            <h3 class="text-lg font-semibold leading-6 text-gray-900 mb-4" id="task-modal-title">New Task</h3>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Title</label>
+                                    <input type="text" id="task-title" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2 border">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Category</label>
+                                    <select id="task-category" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2 border">
+                                        <!-- Categories injected here -->
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Notification Time (Optional)</label>
+                                    <input type="time" id="task-time" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2 border">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Recurring Days</label>
+                                    <div class="flex flex-wrap gap-2">
+                                        <label class="inline-flex items-center"><input type="checkbox" name="recurrence" value="sun" class="rounded border-gray-300 text-primary shadow-sm focus:ring-primary"><span class="ml-2 text-sm text-gray-600">Sun</span></label>
+                                        <label class="inline-flex items-center"><input type="checkbox" name="recurrence" value="mon" class="rounded border-gray-300 text-primary shadow-sm focus:ring-primary"><span class="ml-2 text-sm text-gray-600">Mon</span></label>
+                                        <label class="inline-flex items-center"><input type="checkbox" name="recurrence" value="tue" class="rounded border-gray-300 text-primary shadow-sm focus:ring-primary"><span class="ml-2 text-sm text-gray-600">Tue</span></label>
+                                        <label class="inline-flex items-center"><input type="checkbox" name="recurrence" value="wed" class="rounded border-gray-300 text-primary shadow-sm focus:ring-primary"><span class="ml-2 text-sm text-gray-600">Wed</span></label>
+                                        <label class="inline-flex items-center"><input type="checkbox" name="recurrence" value="thu" class="rounded border-gray-300 text-primary shadow-sm focus:ring-primary"><span class="ml-2 text-sm text-gray-600">Thu</span></label>
+                                        <label class="inline-flex items-center"><input type="checkbox" name="recurrence" value="fri" class="rounded border-gray-300 text-primary shadow-sm focus:ring-primary"><span class="ml-2 text-sm text-gray-600">Fri</span></label>
+                                        <label class="inline-flex items-center"><input type="checkbox" name="recurrence" value="sat" class="rounded border-gray-300 text-primary shadow-sm focus:ring-primary"><span class="ml-2 text-sm text-gray-600">Sat</span></label>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">Leave all unchecked for daily tasks.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                            <button type="submit" class="inline-flex w-full justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-600 sm:ml-3 sm:w-auto">Save</button>
+                            <button type="button" onclick="app.closeModal('task-modal')" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Categories Modal -->
+    <div id="categories-modal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="app.closeModal('categories-modal')"></div>
+        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+            <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-md">
+                    <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                        <h3 class="text-lg font-semibold leading-6 text-gray-900 mb-4">Manage Categories</h3>
+                        
+                        <div class="mb-6">
+                            <h4 class="text-sm font-medium text-gray-700 mb-2">My Categories</h4>
+                            <div id="categories-list" class="space-y-2 max-h-40 overflow-y-auto pr-2">
+                                <!-- Categories list -->
+                            </div>
+                        </div>
+
+                        <form onsubmit="app.saveCategory(event)" class="border-t pt-4">
+                            <input type="hidden" id="category-id">
+                            <h4 class="text-sm font-medium text-gray-700 mb-2" id="category-form-title">Add New Category</h4>
+                            <div class="flex gap-2">
+                                <input type="text" id="category-name" placeholder="Name" required class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2 border">
+                                <input type="color" id="category-color" value="#3b82f6" class="h-9 w-14 rounded-md border border-gray-300 p-1 cursor-pointer">
+                            </div>
+                            <div class="mt-2 text-right">
+                                <button type="submit" class="inline-flex justify-center rounded-md bg-primary px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-600">Add</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                        <button type="button" onclick="app.closeModal('categories-modal')" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
